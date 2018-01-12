@@ -120,3 +120,37 @@ type MessageState struct {
 type DeliveryServer interface {
 	SendState(MessageState)
 }
+
+type EnvelopeSource int
+
+const (
+	_                         = iota
+	PeerSource EnvelopeSource = iota
+	P2PSource  EnvelopeSource = iota
+)
+
+// EnvelopeMeta keeps metadata of received envelopes.
+type EnvelopeMeta struct {
+	Hash   string
+	Topic  TopicType
+	Size   uint32
+	Source EnvelopeSource
+	IsNew  bool
+	Peer   string
+}
+
+func (m *EnvelopeMeta) SourceString() string {
+	switch m.Source {
+	case PeerSource:
+		return "peer"
+	case P2PSource:
+		return "p2p"
+	default:
+		return "unknown"
+	}
+}
+
+// EnvelopeTracer tracks received envelopes.
+type EnvelopeTracer interface {
+	Trace(*EnvelopeMeta)
+}
