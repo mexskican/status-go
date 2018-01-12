@@ -34,16 +34,13 @@ type WhisperEnvelopeTracer struct{}
 
 // Trace is called for every incoming envelope.
 func (t *WhisperEnvelopeTracer) Trace(envelope *whisper.EnvelopeMeta) {
-	envelopeCounter.WithLabelValues(
+	labelValues := []string{
 		envelope.Topic.String(),
 		envelope.SourceString(),
 		strconv.FormatBool(envelope.IsNew),
 		envelope.Peer,
-	).Inc()
-	envelopeVolume.WithLabelValues(
-		envelope.Topic.String(),
-		envelope.SourceString(),
-		strconv.FormatBool(envelope.IsNew),
-		envelope.Peer,
-	).Add(float64(envelope.Size))
+	}
+
+	envelopeCounter.WithLabelValues(labelValues...).Inc()
+	envelopeVolume.WithLabelValues(labelValues...).Add(float64(envelope.Size))
 }

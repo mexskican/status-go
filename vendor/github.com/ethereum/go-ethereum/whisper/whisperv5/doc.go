@@ -121,12 +121,14 @@ type DeliveryServer interface {
 	SendState(MessageState)
 }
 
-type EnvelopeSource int
+type envelopeSource int
 
 const (
-	_                         = iota
-	PeerSource EnvelopeSource = iota
-	P2PSource  EnvelopeSource = iota
+	_ = iota
+	// peerSource indicates a source as a regular peer.
+	peerSource envelopeSource = iota
+	// p2pSource indicates that envelop was received from a trusted peer.
+	p2pSource
 )
 
 // EnvelopeMeta keeps metadata of received envelopes.
@@ -134,16 +136,17 @@ type EnvelopeMeta struct {
 	Hash   string
 	Topic  TopicType
 	Size   uint32
-	Source EnvelopeSource
+	Source envelopeSource
 	IsNew  bool
 	Peer   string
 }
 
+// SourceString converts source to string.
 func (m *EnvelopeMeta) SourceString() string {
 	switch m.Source {
-	case PeerSource:
+	case peerSource:
 		return "peer"
-	case P2PSource:
+	case p2pSource:
 		return "p2p"
 	default:
 		return "unknown"

@@ -616,7 +616,7 @@ func (wh *Whisper) runMessageLoop(p *Peer, rw p2p.MsgReadWriter) error {
 				return errors.New("invalid envelope")
 			}
 
-			wh.traceEnvelope(&envelope, !wh.isEnvelopeCached(envelope.Hash()), PeerSource, p)
+			wh.traceEnvelope(&envelope, !wh.isEnvelopeCached(envelope.Hash()), peerSource, p)
 
 			cached, err := wh.add(&envelope)
 			if err != nil {
@@ -640,7 +640,8 @@ func (wh *Whisper) runMessageLoop(p *Peer, rw p2p.MsgReadWriter) error {
 				}
 
 				wh.traceIncomingDelivery(true, message.SentStatus, nil, &envelope, nil, nil)
-				wh.traceEnvelope(&envelope, false, P2PSource, p)
+				wh.traceEnvelope(&envelope, false, p2pSource, p)
+
 				wh.postEvent(&envelope, true)
 			}
 		case p2pRequestCode:
@@ -785,7 +786,8 @@ func (w *Whisper) traceDelivery(isP2P bool, dir message.Direction, status messag
 	})
 }
 
-func (w *Whisper) traceEnvelope(envelope *Envelope, isNew bool, source EnvelopeSource, peer *Peer) {
+// traceEnvelope collects basic metadata about an envelope and sender peer.
+func (w *Whisper) traceEnvelope(envelope *Envelope, isNew bool, source envelopeSource, peer *Peer) {
 	if w.envelopeTracer == nil {
 		return
 	}
