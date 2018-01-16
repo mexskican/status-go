@@ -4,11 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/status-im/status-go/geth/api"
 	"github.com/status-im/status-go/geth/params"
+	"github.com/status-im/status-go/metrics"
 )
 
 func main() {
@@ -55,8 +54,7 @@ func main() {
 		log.Printf("Stats enabled on %s", *statsAddr)
 
 		go func() {
-			http.Handle("/metrics", promhttp.Handler())
-			log.Fatal(http.ListenAndServe(*statsAddr, nil))
+			metrics.StartMetricsServer(*statsAddr)
 		}()
 	}
 
